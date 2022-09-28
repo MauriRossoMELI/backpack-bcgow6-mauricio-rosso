@@ -3,11 +3,13 @@ package main
 func main() {
 	var user User = User{Name: "Pablo", Surname: "Diaz", Age: 28, Email: "asd@asd.com", Password: "12345"}
 	println("Usuario del comienzo: ", user.Name, " ", user.Surname, " ", user.Age, " ", user.Email, " ", user.Password)
+	println(&user)
 	changeName("newName", "newSurname", &user)
 	changeAge(33, &user)
 	changeEmail("newEmail@asd.com", &user)
 	changePassword("54321", &user)
 	println("Usuario del final: ", user.Name, " ", user.Surname, " ", user.Age, " ", user.Email, " ", user.Password)
+	println(&user)
 }
 
 type User struct {
