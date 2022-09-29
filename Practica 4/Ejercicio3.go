@@ -1,15 +1,16 @@
 package main
 
-import "fmt"
+//import "fmt"
 
 func main() {
-	storeAdded := newStore([]product{newProduct(small, "Bottle", 65.3)})
-	fmt.Printf("%f", storeAdded.Total())
-	fmt.Printf()
+	st := newStore()
+	prod := newProduct(small, "Iphone 11", 400_000)
+	st.Add(prod)
 }
 
 type store struct {
-	products []product
+	storeEcommerce Ecommerce
+	products       []Product
 }
 
 type product struct {
@@ -24,46 +25,45 @@ type Product interface {
 
 type Ecommerce interface {
 	Total() float64
-	Add()
+	Add(prod product) []product
 }
 
-func newProduct(productType string, name string, price float64) product {
-	newProd := product{
-		productType: productType,
-		name:        name,
-		price:       price,
-	}
-	return newProd
-}
-
-func newStore(s []product) Ecommerce {
-
-	return Ecommerce
-}
-
-func Total(productPrices []product) float64 {
+func (prod product) CalculateCost() float64 {
 	totalCost := 0.0
-	for _, prod := range productPrices {
-		switch prod.productType {
-		case "small":
-			totalCost += prod.price
-		case "medium":
-			aditionalCost := (prod.price * 3) / 100
-			totalCost += prod.price + aditionalCost
-		case "big":
-			aditionalCost := (prod.price*6)/100 + 2500
-			totalCost += prod.price + aditionalCost
-		}
+	switch prod.productType {
+	case small:
+		totalCost = prod.price
+	case medium:
+		totalCost = prod.price * 1.03
+	case big:
+		totalCost = prod.price*1.06 + 2500
 	}
 	return totalCost
 }
 
-func Add(prod product) {
-	productList := []product{
-		prod.name,
-		prod.price,
-		prod.productType,
+func (st store) Add(prod product) []product {
+	st.products = append(st.products, prod)
+	return st.products
+}
+
+func (st store) Total() float64 {
+	total := 0.0
+	for _, value := range st.products {
+		total += value.CalculateCost()
 	}
+	return total
+}
+
+func newProduct(productType string, name string, price float64) Product {
+	return product{
+		productType: productType,
+		name:        name,
+		price:       price,
+	}
+}
+
+func newStore() Ecommerce {
+	return store{}
 }
 
 const (
