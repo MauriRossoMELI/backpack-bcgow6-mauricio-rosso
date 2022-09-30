@@ -47,6 +47,7 @@ func (f *File) Write(ticketsUpdated []service.Ticket) error {
 	}
 
 	tickets := ticketsUpdated
+	//fmt.Printf("%v", &tickets)
 
 	err = gocsv.MarshalFile(&tickets, ticketsFile) // Use this to save the CSV back to the file
 	if err != nil {

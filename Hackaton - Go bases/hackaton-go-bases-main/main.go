@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/bootcamp-go/hackaton-go-bases/internal/file"
 	"github.com/bootcamp-go/hackaton-go-bases/internal/service"
 )
@@ -18,11 +20,11 @@ func main() {
 	}
 
 	//READ a ticket by id
-	// ticket, err := service.NewBookings(tickets).Read(3)
-	// if err != nil {
-	// 	panic("An error was occured getting the specified ticket!")
-	// }
-	// fmt.Printf("TICKET 3: %v \n", ticket)
+	ticket, err := service.NewBookings(tickets).Read(3)
+	if err != nil {
+		panic("An error was occured getting the specified ticket!")
+	}
+	fmt.Printf("TICKET 3: %v \n", ticket)
 
 	//WRITE a ticket in the file
 	// newTicket := service.Ticket{Id: 1001, Names: "TESTNAME", Email: "test@test.com", Destination: "Argentina", Date: "23:43", Price: 333}
@@ -47,12 +49,12 @@ func main() {
 	// }
 
 	//DELETE a ticket in the file
-	ticketsEdited, err := service.NewBookings(tickets).Delete(997)
-	if err != nil {
-		panic(err.Error())
-	}
-	errUpdate := fileManager.Write(ticketsEdited.Tickets)
-	if errUpdate != nil {
-		panic(err.Error())
-	}
+	// ticketsEdited, err := service.NewBookings(tickets).Delete(50)
+	// if err != nil {
+	// 	panic(err.Error())
+	// }
+	// errUpdate := fileManager.Write(ticketsEdited.Tickets)
+	// if errUpdate != nil {
+	// 	panic(err.Error())
+	// }
 }

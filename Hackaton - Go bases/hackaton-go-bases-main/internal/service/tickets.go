@@ -62,16 +62,26 @@ func (b *bookings) Update(id int, t Ticket) (bookings, error) { //NO funciona co
 }
 
 func (b *bookings) Delete(id int) (bookings, error) {
-	// index := -1
-	// for i := 0; i < len(b.Tickets); i++ {
-	// 	if b.Tickets[i].Id == id {
-	// 		index = i
-	// 	}
-	// }
+	////Remove record: OPTION 1
+	//Set the record to remove (with id = -1)
+	copyTickets := b.Tickets
+	for i := 0; i < len(b.Tickets); i++ {
+		if b.Tickets[i].Id == id {
+			copyTickets[i].Id = -1
+		}
+	}
 
-	// copy(b.Tickets[index:], b.Tickets[index+1:]) // Shift a[i+1:] left one index.
-	// b.Tickets[len(b.Tickets)-1] = Ticket{}       // Erase last element (write zero value).
-	// b.Tickets = b.Tickets[:len(b.Tickets)-1]     // Truncate slice.
+	b.Tickets = nil
+
+	//Copy all the records and exclude the record with id = -1
+	for i := 0; i < len(copyTickets); i++ {
+		if copyTickets[i].Id != -1 {
+			b.Tickets = append(b.Tickets, copyTickets[i])
+		}
+	}
+
+	////Remove record: OPTION 2
+	//b.Tickets = append(b.Tickets[0:index], b.Tickets[index+1:]...) me duplica el ultimo!
 
 	return *b, nil
 }
