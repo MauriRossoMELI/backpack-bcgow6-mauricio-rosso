@@ -1,0 +1,22 @@
+[
+    {
+        "id" : 1,
+        "name" : "Mauricio", 
+        "surname" : "Rosso", 
+        "email" : "mauricio.rosso@mercadolibre.com", 
+        "age" : 26, 
+        "height" : 190, 
+        "isactive" : true,
+        "createDate" : "2012-04-23T18:25:43.511Z"
+    },
+    {
+        "id" : 2,
+        "name" : "Testing", 
+        "surname" : "Test", 
+        "email" : "test@mercadolibre.com", 
+        "age" : 30, 
+        "height" : 180, 
+        "isactive" : true,
+        "createDate" : "2012-04-23T18:25:43.511Z"
+    }
+]
