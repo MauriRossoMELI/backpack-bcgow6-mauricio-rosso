@@ -42,14 +42,14 @@ func (f *File) Write(ticketsUpdated []service.Ticket) error {
 	}
 	defer ticketsFile.Close()
 
-	if err != nil { //I check again because I check the panic and keep the execution alive.
+	if err != nil { //I check again because I check the panic and keept the execution alive.
 		panic(err)
 	}
 
 	tickets := ticketsUpdated
 	//fmt.Printf("%v", &tickets)
 
-	err = gocsv.MarshalFile(&tickets, ticketsFile) // Use this to save the CSV back to the file
+	err = gocsv.MarshalFile(&tickets, ticketsFile) // I use this to save the CSV back to the file
 	if err != nil {
 		panic(err)
 	}

@@ -12,6 +12,13 @@ func main() {
 	// Funcion para obtener tickets del archivo csv
 	service.NewBookings(tickets)
 
+	defer func() {
+		err := recover()
+		if err != nil {
+			fmt.Println(err)
+		}
+	}()
+
 	fileManager := file.File{}
 	tickets, err := fileManager.Read()
 
