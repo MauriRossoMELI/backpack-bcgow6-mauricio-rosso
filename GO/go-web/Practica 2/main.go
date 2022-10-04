@@ -41,33 +41,27 @@ func CreateEntity(ctx *gin.Context) {
 	var userRequest User
 
 	if err := ctx.ShouldBindJSON(&userRequest); err != nil { //GET ALL THE STRUCT USER BY BODY
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	if userRequest.Name == "" || userRequest.Surname == "" || userRequest.Email == "" || userRequest.Age == 0 || userRequest.Height == 0 || userRequest.CreateDate.IsZero() {
-		if userRequest.Name == "" {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Field name is required!"})
-		} else {
+		if userRequest.Name == "" || userRequest.Surname == "" || userRequest.Email == "" || userRequest.Age == 0 || userRequest.Height == 0 || userRequest.CreateDate.IsZero() {
+			if userRequest.Name == "" {
+				ctx.JSON(http.StatusBadRequest, gin.H{"error": "Field name is required!"})
+			}
 			if userRequest.Surname == "" {
 				ctx.JSON(http.StatusBadRequest, gin.H{"error": "Field surname is required!"})
-			} else {
-				if userRequest.Email == "" {
-					ctx.JSON(http.StatusBadRequest, gin.H{"error": "Field email is required!"})
-				} else {
-					if userRequest.Age == 0 {
-						ctx.JSON(http.StatusBadRequest, gin.H{"error": "Field age is required!"})
-					} else {
-						if userRequest.Height == 0 {
-							ctx.JSON(http.StatusBadRequest, gin.H{"error": "Field 'height' is required!"})
-						} else {
-							if userRequest.CreateDate.IsZero() {
-								ctx.JSON(http.StatusBadRequest, gin.H{"error": "Field 'createDate' is required!"})
-							}
-						}
-					}
-				}
 			}
+			if userRequest.Email == "" {
+				ctx.JSON(http.StatusBadRequest, gin.H{"error": "Field email is required!"})
+			}
+			if userRequest.Age == 0 {
+				ctx.JSON(http.StatusBadRequest, gin.H{"error": "Field age is required!"})
+			}
+			if userRequest.Height == 0 {
+				ctx.JSON(http.StatusBadRequest, gin.H{"error": "Field 'height' is required!"})
+			}
+			if userRequest.CreateDate.IsZero() {
+				ctx.JSON(http.StatusBadRequest, gin.H{"error": "Field 'createDate' is required!"})
+			}
+		} else {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}
 		return
 	}
