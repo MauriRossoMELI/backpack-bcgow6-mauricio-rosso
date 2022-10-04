@@ -43,7 +43,7 @@ func (s *service) Store(name string, surname string, email string, age int, heig
 	return user, nil
 }
 
-func (s *service) Update(id int, name, productType string, count int, price float64) (Product, error) {
+func (s *service) Update(id int, name string, surname string, email string, age int, height int, isActive bool, creationDate time.Time) (User, error) {
 
-	return s.repository.Update(id, name, productType, count, price)
+	return s.repository.Update(id, name, surname, email, age, height, isActive, creationDate)
 }
