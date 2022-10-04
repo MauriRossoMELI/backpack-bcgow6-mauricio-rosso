@@ -10,7 +10,9 @@ import (
 func main() {
 	router := gin.Default()
 	userGroup := router.Group("users")
-	userGroup.POST("", CreateEntity)
+	{
+		userGroup.POST("/createuser", CreateEntity)
+	}
 	router.Run()
 }
 
