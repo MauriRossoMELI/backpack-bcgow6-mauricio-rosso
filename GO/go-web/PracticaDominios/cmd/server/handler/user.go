@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"internal/users"
+	"github.com/MauriRossoMELI/backpack-bcgow6-mauricio-rosso/GO/go-web/Practica%202%20-%20Dominios/internal/users"
 	"time"
 )
 
@@ -16,5 +16,5 @@ type request struct {
 }
 
 type User struct {
-	service users.Service
+	service users.
 }
