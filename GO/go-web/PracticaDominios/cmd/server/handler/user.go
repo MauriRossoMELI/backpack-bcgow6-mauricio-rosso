@@ -22,7 +22,7 @@ type User struct {
 	service users.Service
 }
 
-func NewProduct(p users.Service) *User {
+func NewUser(p users.Service) *User {
 	return &User{
 		service: p,
 	}
@@ -90,7 +90,7 @@ func (c *User) Update() gin.HandlerFunc {
 			return
 		}
 		if req.Name == "" {
-			ctx.JSON(400, gin.H{"error": "The product name is required!"})
+			ctx.JSON(400, gin.H{"error": "The name is required!"})
 			return
 		}
 		if req.Surname == "" {
@@ -103,6 +103,14 @@ func (c *User) Update() gin.HandlerFunc {
 		}
 		if req.Age == 0 {
 			ctx.JSON(400, gin.H{"error": "The age is required!"})
+			return
+		}
+		if req.Height == 0 {
+			ctx.JSON(400, gin.H{"error": "The height is required!"})
+			return
+		}
+		if req.CreationDate.IsZero() {
+			ctx.JSON(400, gin.H{"error": "The creation date is required!"})
 			return
 		}
 		p, err := c.service.Update(int(id), req.Name, req.Surname, req.Email, req.Age, req.Height, req.IsActive, req.CreationDate)
