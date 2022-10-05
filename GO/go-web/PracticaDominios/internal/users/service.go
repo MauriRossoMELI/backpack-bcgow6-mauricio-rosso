@@ -6,6 +6,8 @@ type Service interface {
 	GetAll() ([]User, error)
 	Store(name, surname, email string, age, height int, isActive bool, creationDate time.Time) (User, error)
 	Update(id int, name, surname, email string, age, height int, isActive bool, creationDate time.Time) (User, error)
+	Delete(id int) error
+	UpdateSurnameAge(id int, surname string, age int) (User, error)
 }
 
 type service struct {
@@ -46,4 +48,14 @@ func (s *service) Store(name string, surname string, email string, age int, heig
 func (s *service) Update(id int, name string, surname string, email string, age int, height int, isActive bool, creationDate time.Time) (User, error) {
 
 	return s.repository.Update(id, name, surname, email, age, height, isActive, creationDate)
+}
+
+func (s *service) UpdateSurnameAge(id int, surname string, age int) (User, error) {
+
+	return s.repository.UpdateSurnameAge(id, surname, age)
+}
+
+func (s *service) Delete(id int) error {
+
+	return s.repository.Delete(id)
 }

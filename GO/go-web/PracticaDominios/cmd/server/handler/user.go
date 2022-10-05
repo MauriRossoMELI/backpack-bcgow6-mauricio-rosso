@@ -121,3 +121,58 @@ func (c *User) Update() gin.HandlerFunc {
 		ctx.JSON(200, p)
 	}
 }
+
+func (c *User) UpdateSurnameAge() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		token := ctx.GetHeader("token")
+		if token != "123456" {
+			ctx.JSON(401, gin.H{"error": "token inválido"})
+			return
+		}
+		id, err := strconv.Atoi(ctx.Param("id"))
+		if err != nil {
+			ctx.JSON(400, gin.H{"error": "invalid ID"})
+			return
+		}
+		var req request
+		if err := ctx.ShouldBindJSON(&req); err != nil {
+			ctx.JSON(400, gin.H{"error": err.Error()})
+			return
+		}
+		if req.Surname == "" {
+			ctx.JSON(400, gin.H{"error": "The surname is required!"})
+			return
+		}
+		if req.Age == 0 {
+			ctx.JSON(400, gin.H{"error": "The age is required!"})
+			return
+		}
+		user, err := c.service.UpdateSurnameAge(int(id), req.Surname, req.Age)
+		if err != nil {
+			ctx.JSON(404, gin.H{"error": err.Error()})
+			return
+		}
+		ctx.JSON(200, user)
+	}
+}
+
+func (c *User) Delete() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		token := ctx.Request.Header.Get("token")
+		if token != "123456" {
+			ctx.JSON(401, gin.H{"error": "token inválido"})
+			return
+		}
+		id, err := strconv.Atoi(ctx.Param("id"))
+		if err != nil {
+			ctx.JSON(400, gin.H{"error": "invalid ID"})
+			return
+		}
+		errId := c.service.Delete(id)
+		if errId != nil {
+			ctx.JSON(404, gin.H{"error": errId.Error()})
+			return
+		}
+		ctx.JSON(200, "Usuario eliminado correctamente")
+	}
+}
