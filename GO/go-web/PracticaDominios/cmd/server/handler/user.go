@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"os"
 	"strconv"
 	"time"
 
@@ -52,7 +53,7 @@ func (c *User) GetAll() gin.HandlerFunc {
 func (c *User) Store() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token := ctx.Request.Header.Get("token")
-		if token != "123456" {
+		if token != os.Getenv("TOKEN") {
 			ctx.JSON(401, gin.H{"error": "token inválido"})
 			return
 		}

@@ -3,6 +3,8 @@ package users
 import (
 	"fmt"
 	"time"
+
+	"github.com/MauriRossoMELI/backpack-bcgow6-mauricio-rosso/Documents/MAURI/BOOTCAMP/Go/backpack-bcgow6-mauricio-rosso/GO/go-web/PracticaDominios/pkg/store"
 )
 
 type User struct {
@@ -28,10 +30,12 @@ type Repository interface {
 	UpdateSurnameAge(id int, surname string, age int) (User, error)
 }
 
-type repository struct{} //struct implementa los metodos de la interfaz
+type repository struct {
+	db store.Store
+} //struct implementa los metodos de la interfaz
 
-func NewRepository() Repository {
-	return &repository{}
+func NewRepository(db store.Store) Repository {
+	return &repository{db: db}
 }
 
 func (r *repository) GetAll() ([]User, error) {
@@ -43,9 +47,22 @@ func (r *repository) LastID() (int, error) {
 }
 
 func (r *repository) Store(id int, name string, surname string, email string, age int, height int, isActive bool, creationDate time.Time) (User, error) {
+
+	//Lectura del json
+	err := r.db.Read(&ps)
+	if err != nil {
+		return User{}, err
+	}
+
 	p := User{id, name, surname, email, age, height, isActive, creationDate}
 	ps = append(ps, p)
 	lastID = p.Id
+
+	//Escritura en el json
+	if err := r.db.Write(ps); err != nil {
+		return User{}, err
+	}
+
 	return p, nil
 }
 
