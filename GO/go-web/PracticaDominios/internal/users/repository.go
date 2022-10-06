@@ -39,6 +39,10 @@ func NewRepository(db store.Store) Repository {
 }
 
 func (r *repository) GetAll() ([]User, error) {
+	err := r.db.Read(&ps)
+	if err != nil {
+		return []User{}, err
+	}
 	return ps, nil
 }
 
@@ -67,6 +71,12 @@ func (r *repository) Store(id int, name string, surname string, email string, ag
 }
 
 func (r *repository) Update(id int, name string, surname string, email string, age int, height int, isActive bool, creationDate time.Time) (User, error) {
+	//Lectura del json
+	err := r.db.Read(&ps)
+	if err != nil {
+		return User{}, err
+	}
+
 	p := User{Name: name, Surname: surname, Email: email, Age: age, Height: height, IsActive: isActive, CreationDate: creationDate}
 	updated := false
 	for i := range ps {
@@ -79,10 +89,22 @@ func (r *repository) Update(id int, name string, surname string, email string, a
 	if !updated {
 		return User{}, fmt.Errorf("Usuario %d no encontrado", id)
 	}
+
+	//Escritura en el json
+	if err := r.db.Write(ps); err != nil {
+		return User{}, err
+	}
+
 	return p, nil
 }
 
 func (r *repository) UpdateSurnameAge(id int, surname string, age int) (User, error) {
+	//Lectura del json
+	err := r.db.Read(&ps)
+	if err != nil {
+		return User{}, err
+	}
+
 	updated := false
 	userUpdated := User{}
 	for i := range ps {
@@ -96,10 +118,23 @@ func (r *repository) UpdateSurnameAge(id int, surname string, age int) (User, er
 	if !updated {
 		return User{}, fmt.Errorf("Usuario %d no encontrado", id)
 	}
+
+	//Escritura en el json
+	if err := r.db.Write(ps); err != nil {
+		return User{}, err
+	}
+
 	return userUpdated, nil
 }
 
 func (r *repository) Delete(id int) error {
+
+	//Lectura del json
+	err := r.db.Read(&ps)
+	if err != nil {
+		return err
+	}
+
 	deleted := false
 	for i := range ps {
 		if ps[i].Id == id {
@@ -110,5 +145,11 @@ func (r *repository) Delete(id int) error {
 	if !deleted {
 		return fmt.Errorf("Usuario %d no encontrado", id)
 	}
+
+	//Escritura en el json
+	if err := r.db.Write(ps); err != nil {
+		return err
+	}
+
 	return nil
 }

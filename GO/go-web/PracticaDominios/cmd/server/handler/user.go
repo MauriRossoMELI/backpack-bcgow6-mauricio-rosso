@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/MauriRossoMELI/backpack-bcgow6-mauricio-rosso/Documents/MAURI/BOOTCAMP/Go/backpack-bcgow6-mauricio-rosso/GO/go-web/PracticaDominios/internal/users"
+	"github.com/MauriRossoMELI/backpack-bcgow6-mauricio-rosso/Documents/MAURI/BOOTCAMP/Go/backpack-bcgow6-mauricio-rosso/GO/go-web/PracticaDominios/pkg/store/web"
 	"github.com/gin-gonic/gin"
 )
 
@@ -32,21 +33,23 @@ func NewUser(p users.Service) *User {
 func (c *User) GetAll() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token := ctx.Request.Header.Get("token")
-		if token != "123456" {
-			ctx.JSON(401, gin.H{
-				"error": "token inválido",
-			})
+		if token != os.Getenv("TOKEN") {
+			ctx.JSON(401, web.NewResponse(401, nil, "Token inválido"))
 			return
 		}
 
-		p, err := c.service.GetAll()
+		users, err := c.service.GetAll()
 		if err != nil {
-			ctx.JSON(404, gin.H{
-				"error": err.Error(),
-			})
+			ctx.JSON(500, web.NewResponse(500, nil, err.Error()))
 			return
 		}
-		ctx.JSON(200, p)
+
+		if len(users) == 0 {
+			ctx.JSON(404, web.NewResponse(404, nil, "No users found."))
+			return
+		}
+
+		ctx.JSON(200, web.NewResponse(200, users, ""))
 	}
 }
 
@@ -54,126 +57,124 @@ func (c *User) Store() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token := ctx.Request.Header.Get("token")
 		if token != os.Getenv("TOKEN") {
-			ctx.JSON(401, gin.H{"error": "token inválido"})
+			ctx.JSON(401, web.NewResponse(401, nil, "Token inválido"))
 			return
 		}
 		var req request
 		if err := ctx.Bind(&req); err != nil {
-			ctx.JSON(404, gin.H{
-				"error": err.Error(),
-			})
+			ctx.JSON(400, web.NewResponse(400, nil, err.Error()))
 			return
 		}
-		p, err := c.service.Store(req.Name, req.Surname, req.Email, req.Age, req.Height, req.IsActive, req.CreationDate)
+		user, err := c.service.Store(req.Name, req.Surname, req.Email, req.Age, req.Height, req.IsActive, req.CreationDate)
 		if err != nil {
-			ctx.JSON(404, gin.H{"error": err.Error()})
+			ctx.JSON(500, web.NewResponse(500, nil, err.Error()))
 			return
 		}
-		ctx.JSON(200, p)
+		ctx.JSON(200, web.NewResponse(200, user, "User stored successfully."))
 	}
 }
 
 func (c *User) Update() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token := ctx.GetHeader("token")
-		if token != "123456" {
-			ctx.JSON(401, gin.H{"error": "token inválido"})
+		if token != os.Getenv("TOKEN") {
+			ctx.JSON(401, web.NewResponse(401, nil, "Token inválido"))
 			return
 		}
 		id, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
 		if err != nil {
-			ctx.JSON(400, gin.H{"error": "invalid ID"})
+			ctx.JSON(400, web.NewResponse(400, nil, "Invalid ID!"))
 			return
 		}
 		var req request
 		if err := ctx.ShouldBindJSON(&req); err != nil {
-			ctx.JSON(400, gin.H{"error": err.Error()})
+			ctx.JSON(400, web.NewResponse(400, nil, err.Error()))
 			return
 		}
 		if req.Name == "" {
-			ctx.JSON(400, gin.H{"error": "The name is required!"})
+			ctx.JSON(400, web.NewResponse(400, nil, "The name is required!"))
 			return
 		}
 		if req.Surname == "" {
-			ctx.JSON(400, gin.H{"error": "The surname is required!"})
+			ctx.JSON(400, web.NewResponse(400, nil, "The surname is required!"))
 			return
 		}
 		if req.Email == "" {
-			ctx.JSON(400, gin.H{"error": "The email is required!"})
+			ctx.JSON(400, web.NewResponse(400, nil, "The email is required!"))
 			return
 		}
 		if req.Age == 0 {
-			ctx.JSON(400, gin.H{"error": "The age is required!"})
+			ctx.JSON(400, web.NewResponse(400, nil, "The age is required!"))
 			return
 		}
 		if req.Height == 0 {
-			ctx.JSON(400, gin.H{"error": "The height is required!"})
+			ctx.JSON(400, web.NewResponse(400, nil, "The height is required!"))
 			return
 		}
 		if req.CreationDate.IsZero() {
-			ctx.JSON(400, gin.H{"error": "The creation date is required!"})
+			ctx.JSON(400, web.NewResponse(400, nil, "The creation date is required!"))
 			return
 		}
-		p, err := c.service.Update(int(id), req.Name, req.Surname, req.Email, req.Age, req.Height, req.IsActive, req.CreationDate)
+		user, err := c.service.Update(int(id), req.Name, req.Surname, req.Email, req.Age, req.Height, req.IsActive, req.CreationDate)
 		if err != nil {
-			ctx.JSON(404, gin.H{"error": err.Error()})
+			ctx.JSON(400, web.NewResponse(400, nil, err.Error()))
 			return
 		}
-		ctx.JSON(200, p)
+		ctx.JSON(200, web.NewResponse(200, user, "User updated successfully!"))
 	}
 }
 
 func (c *User) UpdateSurnameAge() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token := ctx.GetHeader("token")
-		if token != "123456" {
-			ctx.JSON(401, gin.H{"error": "token inválido"})
+		if token != os.Getenv("TOKEN") {
+			ctx.JSON(401, web.NewResponse(401, nil, "Token inválido"))
 			return
 		}
 		id, err := strconv.Atoi(ctx.Param("id"))
 		if err != nil {
-			ctx.JSON(400, gin.H{"error": "invalid ID"})
+			ctx.JSON(400, web.NewResponse(400, nil, "Invalid ID!"))
 			return
 		}
 		var req request
 		if err := ctx.ShouldBindJSON(&req); err != nil {
-			ctx.JSON(400, gin.H{"error": err.Error()})
+			ctx.JSON(400, web.NewResponse(400, nil, err.Error()))
 			return
 		}
 		if req.Surname == "" {
-			ctx.JSON(400, gin.H{"error": "The surname is required!"})
+			ctx.JSON(400, web.NewResponse(400, nil, "The surname is required!"))
 			return
 		}
 		if req.Age == 0 {
-			ctx.JSON(400, gin.H{"error": "The age is required!"})
+			ctx.JSON(400, web.NewResponse(400, nil, "The age is required!"))
 			return
 		}
 		user, err := c.service.UpdateSurnameAge(int(id), req.Surname, req.Age)
 		if err != nil {
-			ctx.JSON(404, gin.H{"error": err.Error()})
+			ctx.JSON(400, web.NewResponse(400, nil, err.Error()))
 			return
 		}
-		ctx.JSON(200, user)
+		ctx.JSON(200, web.NewResponse(200, user, "User updated (surname & age) successfully!"))
 	}
 }
 
 func (c *User) Delete() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token := ctx.Request.Header.Get("token")
-		if token != "123456" {
-			ctx.JSON(401, gin.H{"error": "token inválido"})
+		if token != os.Getenv("TOKEN") {
+			ctx.JSON(401, web.NewResponse(401, nil, "Token inválido"))
 			return
 		}
 		id, err := strconv.Atoi(ctx.Param("id"))
 		if err != nil {
-			ctx.JSON(400, gin.H{"error": "invalid ID"})
+			ctx.JSON(400, web.NewResponse(400, nil, "Invalid ID!"))
 			return
 		}
 		errId := c.service.Delete(id)
 		if errId != nil {
-			ctx.JSON(404, gin.H{"error": errId.Error()})
+			ctx.JSON(400, web.NewResponse(400, nil, err.Error()))
 			return
 		}
-		ctx.JSON(200, "Usuario eliminado correctamente")
+		ctx.JSON(200, web.NewResponse(200, nil, "User deleted successfully!"))
 	}
 }
