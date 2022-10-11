@@ -30,6 +30,15 @@ func NewUser(p users.Service) *User {
 	}
 }
 
+// ListUsers godoc
+// @Summary List users
+// @Tags Users
+// @Description get users
+// @Accept  json
+// @Produce  json
+// @Param token header string true "token"
+// @Success 200 {object} web.Response
+// @Router /users [get]
 func (c *User) GetAll() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token := ctx.Request.Header.Get("token")
@@ -53,6 +62,16 @@ func (c *User) GetAll() gin.HandlerFunc {
 	}
 }
 
+// StoreUsers godoc
+// @Summary Store users
+// @Tags Users
+// @Description store users
+// @Accept  json
+// @Produce  json
+// @Param token header string true "token"
+// @Param user body request true "User to store"
+// @Success 200 {object} web.Response
+// @Router /users [post]
 func (c *User) Store() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token := ctx.Request.Header.Get("token")
@@ -74,6 +93,17 @@ func (c *User) Store() gin.HandlerFunc {
 	}
 }
 
+// UpdateUsers godoc
+// @Summary Update users
+// @Tags Users
+// @Description update users
+// @Accept  json
+// @Produce  json
+// @Param token header string true "token"
+// @Param id url int true "User id"
+// @Param user body request true "User to update"
+// @Success 200 {object} web.Response
+// @Router /users [put]
 func (c *User) Update() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token := ctx.GetHeader("token")
@@ -124,6 +154,17 @@ func (c *User) Update() gin.HandlerFunc {
 	}
 }
 
+// UpdateSurnameAge godoc
+// @Summary Update users surname and age
+// @Tags Users
+// @Description update users surname and age
+// @Accept  json
+// @Produce  json
+// @Param token header string true "token"
+// @Param id url int true "User id"
+// @Param user body request true "Surname and age to update"
+// @Success 200 {object} web.Response
+// @Router /users [patch]
 func (c *User) UpdateSurnameAge() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token := ctx.GetHeader("token")
@@ -158,6 +199,16 @@ func (c *User) UpdateSurnameAge() gin.HandlerFunc {
 	}
 }
 
+// DeleteUsers godoc
+// @Summary Delete users
+// @Tags Users
+// @Description delete users
+// @Accept  json
+// @Produce  json
+// @Param token header string true "token"
+// @Param id url int true "User id to delete"
+// @Success 200 {object} web.Response
+// @Router /users [delete]
 func (c *User) Delete() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token := ctx.Request.Header.Get("token")
