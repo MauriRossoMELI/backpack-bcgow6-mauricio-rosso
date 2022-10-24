@@ -64,8 +64,15 @@ func (s StubStore) Write(data interface{}) error {
 			CreationDate: "01-01-2012",
 		},
 	}
-	stubDataB, _ := json.Marshal(stubData)
-	json.Unmarshal(stubDataB, data)
+	stubDataB, errMarshal := json.Marshal(stubData)
+	if errMarshal != nil {
+		return errMarshal
+	}
+	errUnmarshal := json.Unmarshal(stubDataB, data)
+	if errUnmarshal != nil {
+		return errUnmarshal
+	}
+
 	return nil
 }
 

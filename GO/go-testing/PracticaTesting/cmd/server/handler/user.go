@@ -3,7 +3,6 @@ package handler
 import (
 	"os"
 	"strconv"
-	"time"
 
 	"github.com/backpack-bcgow6-mauricio-rosso/go-testing/internal/users"
 	"github.com/backpack-bcgow6-mauricio-rosso/go-testing/pkg/store/web"
@@ -11,13 +10,13 @@ import (
 )
 
 type request struct {
-	Name         string    `json:"name"`
-	Surname      string    `json:"surname"`
-	Email        string    `json:"email"`
-	Age          int       `json:"age"`
-	Height       int       `json:"height"`
-	IsActive     bool      `json:"isactive"`
-	CreationDate time.Time `json:"creationdate"`
+	Name         string `json:"name"`
+	Surname      string `json:"surname"`
+	Email        string `json:"email"`
+	Age          int    `json:"age"`
+	Height       int    `json:"height"`
+	IsActive     bool   `json:"isactive"`
+	CreationDate string `json:"creationdate"`
 }
 
 type User struct {
@@ -141,7 +140,7 @@ func (c *User) Update() gin.HandlerFunc {
 			ctx.JSON(400, web.NewResponse(400, nil, "The height is required!"))
 			return
 		}
-		if req.CreationDate.IsZero() {
+		if req.CreationDate == "" {
 			ctx.JSON(400, web.NewResponse(400, nil, "The creation date is required!"))
 			return
 		}

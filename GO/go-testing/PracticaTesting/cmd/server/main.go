@@ -24,5 +24,8 @@ func main() {
 	pr.PUT("/:id", p.Update())
 	pr.DELETE("/:id", p.Delete())
 	pr.PATCH("/:id", p.UpdateSurnameAge())
-	r.Run()
+	errRun := r.Run()
+	if errRun != nil {
+		println(errRun.Error())
+	}
 }
