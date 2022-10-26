@@ -13,9 +13,11 @@ func TestServiceUpdate(t *testing.T) {
 	repo := NewRepository(&myStubStore)
 	service := NewService(repo)
 	dataEsperada := User{1, "Mauri", "Rosso", "mauri@mercadolibre.com", 1, 1293, true, "01-01-2012"}
+	//expectedError := errors.New("usuario 1 no encontrado")
 	//act
-	resultado, _ := service.Update(1, "Mauri", "Rosso", "mauri@mercadolibre.com", 1, 1293, true, "01-01-2012")
+	resultado, err := service.Update(1, "Mauri", "Rosso", "mauri@mercadolibre.com", 1, 1293, true, "01-01-2012")
 	//assert
+	assert.Nil(t, err)
 	assert.Equal(t, dataEsperada, resultado)
 	assert.True(t, myStubStore.ReadWasCalled)
 }

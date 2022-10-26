@@ -1,20 +1,22 @@
-package users
+package test
 
 import (
 	"encoding/json"
-	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/backpack-bcgow6-mauricio-rosso/go-testing/internal/users"
 )
 
-type StubStore struct {
+type mockStorage struct {
+	DataMock      []users.User
+	ErrWrite      string
+	ErrRead       string
 	ReadWasCalled bool
 }
 
-func (s *StubStore) Read(data interface{}) error {
+func (s *mockStorage) Read(data interface{}) error {
 	s.ReadWasCalled = true
-	users := data.(*[]User)
-	stubData := []User{
+	usersData := data.(*[]users.User)
+	stubData := []users.User{
 		// {
 		// 	Id:           1,
 		// 	Name:         "Mauri",
@@ -36,12 +38,12 @@ func (s *StubStore) Read(data interface{}) error {
 			CreationDate: "01-01-2012",
 		},
 	}
-	*users = stubData
+	*usersData = stubData
 	return nil
 }
 
-func (s *StubStore) Write(data interface{}) error {
-	stubData := []User{
+func (s *mockStorage) Write(data interface{}) error {
+	stubData := []users.User{
 		{
 			Id:           1,
 			Name:         "Mauri",
@@ -73,36 +75,4 @@ func (s *StubStore) Write(data interface{}) error {
 	}
 
 	return nil
-}
-
-func TestGetAll(t *testing.T) {
-	//arrange
-	myStubStore := StubStore{}
-	repo := NewRepository(&myStubStore)
-	dataEsperada := []User{
-		{
-			Id:           1,
-			Name:         "Mauri",
-			Surname:      "Rosso",
-			Email:        "mauri@mercadolibre.com",
-			Age:          1,
-			Height:       1293,
-			IsActive:     true,
-			CreationDate: "01-01-2012",
-		},
-		{
-			Id:           2,
-			Name:         "Pablo",
-			Surname:      "Testing",
-			Email:        "pablo@mercadolibre.com",
-			Age:          1,
-			Height:       1293,
-			IsActive:     true,
-			CreationDate: "01-01-2012",
-		},
-	}
-	//act
-	resultado, _ := repo.GetAll()
-	//assert
-	assert.Equal(t, dataEsperada, resultado)
 }
