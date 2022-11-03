@@ -1,1 +1,0 @@
-# backpack-bcgow6-mauricio-rosso
