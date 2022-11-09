@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"storageproject/internal/domain"
 	"storageproject/internal/product"
 	"strconv"
 
@@ -58,47 +59,51 @@ func (m *Product) Delete() gin.HandlerFunc {
 	}
 }
 
-/*
-func (m *Movie) Create() gin.HandlerFunc {
+func (m *Product) Create() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
-		var movie domain.Movie
-		err := ctx.ShouldBindJSON(&movie)
+		var product domain.Product
+		err := ctx.ShouldBindJSON(&product)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}
 
-		movie, err = m.service.Save(ctx, movie)
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		newId, errSave := m.service.Save(ctx, product)
+		if errSave != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": errSave.Error()})
 			return
 		}
 
-		ctx.JSON(http.StatusOK, gin.H{"movie": movie.Title + " added"})
+		product, errGetId := m.service.GetById(ctx, newId)
+		if errGetId != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": errSave.Error()})
+			return
+		}
+
+		ctx.JSON(http.StatusOK, gin.H{"product added ": product.Name})
 	}
 }
 
-func (m *Movie) Update() gin.HandlerFunc {
+func (m *Product) Update() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id, err := strconv.Atoi(ctx.Param("id"))
 		if err != nil {
 			ctx.JSON(404, gin.H{"error": "invalid ID"})
 			return
 		}
-		var movie domain.Movie
-		err = ctx.ShouldBindJSON(&movie)
+		var product domain.Product
+		err = ctx.ShouldBindJSON(&product)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		movie, err = m.service.Update(ctx, movie, id)
+		err = m.service.Update(ctx, product, id)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, err)
 			return
 		}
-		movie.ID = id
-		ctx.JSON(http.StatusOK, gin.H{"movie": movie})
+
+		ctx.JSON(http.StatusOK, gin.H{"product updated": product.Name})
 	}
 }
-*/

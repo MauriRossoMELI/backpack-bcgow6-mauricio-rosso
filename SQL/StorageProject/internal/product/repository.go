@@ -9,11 +9,12 @@ import (
 
 type Repository interface {
 	GetByName(ctx context.Context, name string) (domain.Product, error)
+	GetById(ctx context.Context, id int) (domain.Product, error)
 	GetAll(ctx context.Context) ([]domain.Product, error)
+	Save(ctx context.Context, b domain.Product) (int, error)
+	Update(ctx context.Context, b domain.Product, id int) error
 	Delete(ctx context.Context, id int) error
-	// Save(ctx context.Context, b domain.Movie) (int64, error)
-	// Exists(ctx context.Context, id int) bool
-	// Update(ctx context.Context, b domain.Movie, id int) error
+	Exists(ctx context.Context, id int) bool
 }
 
 type repository struct {
@@ -27,13 +28,13 @@ func NewRepository(db *sql.DB) Repository {
 }
 
 const (
-	// SAVE_MOVIE     = "INSERT INTO movies (title, rating, awards, length, genre_id) VALUES (?, ?, ?, ?, ?);"
-	// UPDATE_MOVIE   = "UPDATE movies SET title=?, rating=?, awards=?, length=?, genre_id=? WHERE id=?;"
-
-	GET_ALL_PRODUCTS = "SELECT id, name, type, count, price FROM products"
-	GET_PRODUCT      = "SELECT id, name, type, count, price FROM products WHERE name=?;"
-	EXIST_PRODUCT    = "SELECT p.id FROM products p WHERE p.id=?"
-	DELETE_PRODUCT   = "DELETE FROM products WHERE id=?"
+	GET_ALL_PRODUCTS    = "SELECT id, name, type, count, price, id_warehouse FROM products"
+	GET_PRODUCT_BY_NAME = "SELECT id, name, type, count, price, id_warehouse FROM products WHERE name=?;"
+	GET_PRODUCT_BY_ID   = "SELECT id, name, type, count, price, id_warehouse FROM products WHERE id=?;"
+	SAVE_PRODUCT        = "INSERT INTO products (name, type, count, price, id_warehouse) VALUES (?, ?, ?, ?, ?);"
+	UPDATE_PRODUCT      = "UPDATE products SET name=?, type=?, count=?, price=?, id_warehouse=? WHERE id=?;"
+	DELETE_PRODUCT      = "DELETE FROM products WHERE id=?"
+	EXIST_PRODUCT       = "SELECT p.id FROM products p WHERE p.id=?"
 )
 
 func (r *repository) Exists(ctx context.Context, id int) bool {
@@ -43,9 +44,18 @@ func (r *repository) Exists(ctx context.Context, id int) bool {
 }
 
 func (r *repository) GetByName(ctx context.Context, name string) (domain.Product, error) {
-	row := r.db.QueryRow(GET_PRODUCT, name)
+	row := r.db.QueryRow(GET_PRODUCT_BY_NAME, name)
 	var product domain.Product
-	if err := row.Scan(&product.Id, &product.Name, &product.Type, &product.Count, &product.Price); err != nil {
+	if err := row.Scan(&product.Id, &product.Name, &product.Type, &product.Count, &product.Price, &product.IdWarehouse); err != nil {
+		return domain.Product{}, err
+	}
+	return product, nil
+}
+
+func (r *repository) GetById(ctx context.Context, id int) (domain.Product, error) {
+	row := r.db.QueryRow(GET_PRODUCT_BY_ID, id)
+	var product domain.Product
+	if err := row.Scan(&product.Id, &product.Name, &product.Type, &product.Count, &product.Price, &product.IdWarehouse); err != nil {
 		return domain.Product{}, err
 	}
 	return product, nil
@@ -60,7 +70,7 @@ func (r *repository) GetAll(ctx context.Context) ([]domain.Product, error) {
 
 	for rows.Next() {
 		var prod domain.Product
-		err := rows.Scan(&prod.Id, &prod.Name, &prod.Type, &prod.Count, &prod.Price)
+		err := rows.Scan(&prod.Id, &prod.Name, &prod.Type, &prod.Count, &prod.Price, &prod.IdWarehouse)
 		if err != nil {
 			return []domain.Product{}, err
 		}
@@ -93,15 +103,14 @@ func (r *repository) Delete(ctx context.Context, id int) error {
 	return nil
 }
 
-/*
-func (r *repository) Save(ctx context.Context, m domain.Movie) (int64, error) {
-	stm, err := r.db.Prepare(SAVE_MOVIE) //preparamos la consulta
+func (r *repository) Save(ctx context.Context, p domain.Product) (int, error) {
+	stm, err := r.db.Prepare(SAVE_PRODUCT) //preparamos la consulta
 	if err != nil {
 		return 0, err
 	}
 
 	//ejecutamos la consulta con aquellos valores a remplazar en la sentencia
-	result, err := stm.Exec(m.Title, m.Rating, m.Awards, m.Length, m.Genre_id)
+	result, err := stm.Exec(p.Name, p.Type, p.Count, p.Price, p.IdWarehouse)
 	if err != nil {
 		return 0, err
 	}
@@ -112,18 +121,18 @@ func (r *repository) Save(ctx context.Context, m domain.Movie) (int64, error) {
 		return 0, err
 	}
 
-	return id, nil
+	return int(id), nil
 }
 
-func (r *repository) Update(ctx context.Context, m domain.Movie, id int) error {
-	stm, err := r.db.Prepare(UPDATE_MOVIE)
+func (r *repository) Update(ctx context.Context, p domain.Product, id int) error {
+	stm, err := r.db.Prepare(UPDATE_PRODUCT)
 	if err != nil {
 		return err
 	}
 	defer stm.Close() //cerramos para no perder memoria
 
 	//ejecutamos la consulta con aquellos valores a remplazar en la sentencia
-	result, err := stm.Exec(m.Title, m.Rating, m.Awards, m.Length, m.Genre_id, id)
+	result, err := stm.Exec(p.Name, p.Type, p.Count, p.Price, p.IdWarehouse, id)
 	if err != nil {
 		return err
 	}
@@ -137,4 +146,3 @@ func (r *repository) Update(ctx context.Context, m domain.Movie, id int) error {
 	}
 	return nil
 }
-*/
