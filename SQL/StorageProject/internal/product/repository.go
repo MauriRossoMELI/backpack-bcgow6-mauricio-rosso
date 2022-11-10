@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"storageproject/internal/domain"
 )
 
@@ -53,16 +54,24 @@ func (r *repository) GetByName(ctx context.Context, name string) (domain.Product
 }
 
 func (r *repository) GetById(ctx context.Context, id int) (domain.Product, error) {
-	row := r.db.QueryRow(GET_PRODUCT_BY_ID, id)
-	var product domain.Product
-	if err := row.Scan(&product.Id, &product.Name, &product.Type, &product.Count, &product.Price, &product.IdWarehouse); err != nil {
+	stmt, err := r.db.Prepare(GET_PRODUCT_BY_ID)
+	if err != nil {
+		return domain.Product{}, fmt.Errorf("error al preparar la consulta - error %v", err)
+	}
+	defer stmt.Close()
+
+	var product domain.Product // id, name, type, count, price, id_warehouse
+	err = stmt.QueryRowContext(ctx, id).Scan(&product.Id, &product.Name, &product.Type, &product.Count, &product.Price, &product.IdWarehouse)
+	if err != nil {
 		return domain.Product{}, err
 	}
+
 	return product, nil
 }
 
 func (r *repository) GetAll(ctx context.Context) ([]domain.Product, error) {
 	var products []domain.Product
+	//QUERY DEVUELVE TODOS LOS REGISTROS. QUERYROW DEVUELVE SOLO 1 REGISTRO
 	rows, err := r.db.Query(GET_ALL_PRODUCTS)
 	if err != nil {
 		return []domain.Product{}, err
@@ -80,36 +89,15 @@ func (r *repository) GetAll(ctx context.Context) ([]domain.Product, error) {
 	return products, nil
 }
 
-func (r *repository) Delete(ctx context.Context, id int) error {
-	stm, err := r.db.Prepare(DELETE_PRODUCT)
-	if err != nil {
-		return err
-	}
-	defer stm.Close() //cerramos para no perder memoria
-
-	result, err := stm.Exec(id)
-	if err != nil {
-		return err
-	}
-
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return err
-	}
-	if rowsAffected == 0 {
-		return errors.New("error: no affected rows")
-	}
-
-	return nil
-}
-
 func (r *repository) Save(ctx context.Context, p domain.Product) (int, error) {
 	stm, err := r.db.Prepare(SAVE_PRODUCT) //preparamos la consulta
 	if err != nil {
 		return 0, err
 	}
+	defer stm.Close()
 
 	//ejecutamos la consulta con aquellos valores a remplazar en la sentencia
+	// result, err := stm.ExecContext(ctx, p.Name, p.Type, p.Count, p.Price, p.IdWarehouse)
 	result, err := stm.Exec(p.Name, p.Type, p.Count, p.Price, p.IdWarehouse)
 	if err != nil {
 		return 0, err
@@ -144,5 +132,29 @@ func (r *repository) Update(ctx context.Context, p domain.Product, id int) error
 	if affected < 1 {
 		return errors.New("error: no affected rows")
 	}
+	return nil
+}
+
+func (r *repository) Delete(ctx context.Context, id int) error {
+	stm, err := r.db.Prepare(DELETE_PRODUCT)
+	if err != nil {
+		return err
+	}
+	defer stm.Close() //cerramos para no perder memoria
+
+	result, err := stm.Exec(id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected != 1 {
+		return errors.New("error: no affected rows")
+	}
+
 	return nil
 }
